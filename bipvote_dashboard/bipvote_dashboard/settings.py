@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=bqac9ox%ur)038$w%x*_rve0g+ncx+cqnhq81jt*&fr$4x&2)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '217.160.201.54', 'bipvote.ml']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = True

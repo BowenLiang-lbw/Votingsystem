@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+
+    <!-- Choose Language -->
+    <form id="chooseLanguage">
+        <block>
+            <prompt>Welcome to our voting system!</prompt>
+            <prompt>Press dial key 1 for continuing in English</prompt>
+            <prompt>Appuyez sur la touche de sélection deux pour continuer en français.</prompt>
+        </block>
+        <field name="languageChoice">
+            <grammar mode="dtmf" root="language">
+                <rule id="language" scope="public">
+                    <one-of>
+                        <item>1</item>
+                        <item>2</item>
+                    </one-of>
+                </rule>
+            </grammar>
+            <filled>
+                <!-- English -->
+                <if cond="languageChoice == '1'">
+                    <goto next="https://ict4d-vxml-tester-2023.s3.amazonaws.com/media/uploads/lbw2000tju%40163.com/96/menu_En.xml"/>
+                </if>
+                <!-- French -->
+                <if cond="languageChoice == '2'">
+                    <goto next="https://ict4d-vxml-tester-2023.s3.amazonaws.com/media/uploads/lbw2000tju%40163.com/96/menu_Fr.xml"/>
+                </if>
+            </filled>
+            <noinput>
+                <prompt>I did not hear your choice. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <nomatch>
+                <prompt>It is not a valid choice. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+        </field>
+    </form>
+
+</vxml>
