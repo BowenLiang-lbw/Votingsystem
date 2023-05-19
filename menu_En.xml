@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+
+<!-- English version -->
+    <form id="menu_En">
+        <field name="choose_vote_or_opinion">
+            <prompt>To participate in the current topic, please indicate your preference 
+            by pressing the corresponding dial key. Press "1" to vote and press "2" to 
+            express your opinion.</prompt>
+            <help>Please press dial key 1 or 2.</help>
+            <grammar  mode="dtmf" root="v_or_op">
+                <rule id="v_or_op" scope="public">
+                    <one-of>
+                        <item>1</item>
+                        <item>2</item>
+                    </one-of>
+                </rule>
+            </grammar>
+            <!-- Handling no input from user -->
+            <noinput>
+                <prompt>I did not hear you. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <!-- Handling no valid input from user -->
+            <nomatch>
+                <prompt>It is not a valid number. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+        </field>
+        <!-- Go to the corresponding part -->
+        <filled>
+                <!-- Choose to vote -->
+                <if cond="choose_vote_or_opinion == '1'">You choose to vote for the current topic.
+                    <assign name="vote_or_opinion" expr="'0'"/>
+                    <goto next="#vote_En"/>
+                <!-- Choose to express opinion -->
+                <else/>You choose to express your opinion for the current topic.
+                    <assign name="vote_or_opinion" expr="'1'"/>
+                    <goto next="#opinion_En"/>
+                </if>
+        </filled>
+    </form>
+
+    <!-- Vote part -->
+    <form id="vote_En"> 
+        <field name="vote_choice">
+            <prompt>To vote for the current topic, press dial key 1 for yes, press dial key 2 for no.</prompt>
+            <help>Please press dial key 1 or 2.</help>
+            <grammar  mode="dtmf" root="v_ch">
+                <rule id="v_ch" scope="public">
+                    <one-of>
+                        <item>1</item>
+                        <item>2</item>
+                    </one-of>
+                </rule>
+            </grammar>
+            <!-- Handling no input from user -->
+            <noinput>
+                <prompt>I did not hear you. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <!-- Handling no valid input from user -->
+            <nomatch>
+                <prompt>It is not a valid number. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+        </field>
+        <filled>  
+                <assign name="voteChoice" expr="vote_choice"/>
+                <!-- Vote for yes -->
+                <if cond="voteChoice == '1'">
+                    <assign name="choice" expr="'1'"/>
+                <!-- Vote for no -->
+                <else/>
+                    <assign name="choice" expr="'0'"/>
+                </if>
+                <goto next="#vote_confirm"/>
+        </filled>
+    </form>
+
+    <!-- Confirm part -->
+    <form id="vote_confirm">
+            <field name="confirm_choice">
+                <prompt>You choose <value expr="voteChoice" /> as your vote.</prompt>
+                <prompt>Are you sure this is your intended vote? Press 1 for yes to confirm, 
+                or press 2 to re-vote and make a different choice.</prompt>
+                <help>Please press dial key 1 or 2.</help>
+                <grammar  mode="dtmf" root="v_con">
+                    <rule id="v_con" scope="public">
+                        <one-of>
+                            <item>1</item>
+                            <item>2</item>
+                        </one-of>
+                    </rule>
+                </grammar>
+            <!-- Handling no input from user -->
+            <noinput>
+                <prompt>I did not hear you. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <!-- Handling no valid input from user -->
+            <nomatch>
+                <prompt>It is not a valid number. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+            </field>
+            <filled>
+                <!-- Vote again -->
+                <if cond="confirm_choice == '2'">
+                    <goto next="#vote_En"/>
+                <!-- Confirm choice -->
+                <else/>
+                    <goto next="#opinion_after_voting"/>
+                </if>
+            </filled>
+    </form>
+
+    <!-- Ask users if they want to leave an opinion after voting -->
+    <form id="opinion_after_voting">
+            <field name="opinion_vote">
+                <prompt>Do you also want to express your opinion for the current topic?</prompt>
+                <prompt>Press 1 for yes and press 2 for no.</prompt>
+                <grammar  mode="dtmf" root="op_after_v">
+                    <rule id="op_after_v" scope="public">
+                        <one-of>
+                            <item>1</item>
+                            <item>2</item>
+                        </one-of>
+                    </rule>
+                </grammar>
+            <!-- Handling no input from user -->
+            <noinput>
+                <prompt>I did not hear you. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <!-- Handling no valid input from user -->
+            <nomatch>
+                <prompt>It is not a valid number. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+            </field>
+            <filled>
+                <!-- User dosen't want to express opinion -->
+                <if cond="opinion_vote == '2'">
+                    <goto next="#submit_result"/>
+                <else/>
+                <!-- User choose to express opinion -->
+                    <assign name="vote_or_opinion" expr="'2'"/>
+                    <goto next="#opinion_En"/>
+                </if>
+            </filled>                
+    </form>
+
+    <!-- Opinion -->
+    <form id="opinion_En">
+        <record  name="msg" beep="true" maxtime="15s" finalsilence="1000ms"
+            dtmfterm="true" type="audio/x-wav">
+            <prompt timeout="4s" bargein="false">
+                Please record your opinion after the beep.
+            </prompt>
+            <noinput>
+                I didn't hear anything, please try again.
+            </noinput>
+        </record>
+        <field name="confirm_opinion">
+            <prompt>
+                Your opinion is <audio expr="msg"/>.
+            </prompt>
+            <prompt>
+                Press dial key 1 to keep it. Press dial key 2 to record again.
+            </prompt>
+                <grammar  mode="dtmf" root="op_con">
+                    <rule id="op_con" scope="public">
+                        <one-of>
+                            <item>1</item>
+                            <item>2</item>
+                        </one-of>
+                    </rule>
+                </grammar>
+            <!-- Handling no input from user -->
+            <noinput>
+                <prompt>I did not hear you. Please try again.</prompt>
+                <reprompt />
+            </noinput>
+            <!-- Handling no valid input from user -->
+            <nomatch>
+                <prompt>It is not a valid number. Please try again.</prompt>
+                <reprompt />
+            </nomatch>
+            <filled>
+                <assign name="opinion" expr="msg"/>
+                <!-- Keep the recording -->
+                <if cond="confirm_opinion == '1'">
+                    <goto next="#submit_result"/>
+                <!-- Record again-->
+                <else/>
+                    <goto next="#opinion_En"/>
+                </if>
+            </filled>
+        </field>
+    </form>
+
+    <!-- Submit the final result -->
+    <form id="postResult">
+        <block>
+                <assign name="key" expr="'bipvote'"/>
+            
+                <if cond="vote_or_opinion == '0'">
+                    <assign name="opinion" expr="'0'"/>
+
+                <elseif cond="vote_or_opinion == '1'"/>
+                    <assign name="choice" expr="'0'"/>
+
+                </if>
+                <assign name="lang" expr="'en'"/>
+                <submit enctype="multipart/form-data"
+                        method="post" namelist="opinion choice vote_or_opinion key lang" next="http://127.0.0.1:8000/vote/" />
+                <clear/>
+        </block>
+    </form>
+</vxml>

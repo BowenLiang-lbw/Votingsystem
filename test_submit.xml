@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+  <form>
+    <block>
+      <prompt>Please press any key.</prompt>
+    </block>
+    <submit next="http://127.0.0.1:8000/collect_dtmf/" method="post" namelist="'1'"/>
+  </form>
+</vxml>

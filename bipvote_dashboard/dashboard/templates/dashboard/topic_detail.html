@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<div class="container">
+    <div class="navbar navbar-light bg-light">
+        <ul class="nav nav-pills nav-fill">
+          <li class="navbar-brand" href="{% url 'index' %}">
+            <img src="/static/dashboard/img/logo.png" width="80" height="80" class="d-inline-block align-top" alt="">
+          </li>
+        </ul>
+
+        <ul class="nav nav-pills nav-fill">
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-primary me-2" href="{% url 'index' %}" style="background-color: yellow; color: black;">
+            Homepage
+          </a>
+        </li>
+          <li class="nav-item">
+            <a class="btn btn-primary me-2" href="{% url 'topic' %}" style="background-color: yellow; color: black;">
+              Create topic
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: yellow; color: black;">
+              {{ request.user.username }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url 'admin_logout' %}" >Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col col-lg-6 align-self-center">
+          {% if latest_pos_opinion_nr == 0 and latest_neg_opinion_nr == 0 %}
+          <h1>No opinions yet, refresh to check again.</h1>
+          {% else %}
+          <canvas class="p-3" id="myChart" width="100" height="100"></canvas>
+            <script>
+                var xValues = ["Yes", "No"];
+                var yValues = [{{latest_pos_opinion_nr | safe}}, {{latest_neg_opinion_nr | safe}}];
+                var barColors = [
+                  "#198754",
+                  "#dc3545"
+                ];
+
+                new Chart("myChart", {
+                  type: "pie",
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      backgroundColor: barColors,
+                      data: yValues
+                    }]
+                  },
+                  options: {
+                    plugins:{
+                    legend: {
+                      position: 'right',
+                      labels:{
+                      font: {
+                        size: 10,
+                      }
+                      }
+                    }
+                    }
+
+                  }
+                });
+                </script>
+        {% endif %}
+        </div>
+    </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <ul class="list-group">
+          <li class="list-group-item bg-success text-light">Yes</li>
+          {% if pos_opinion %}
+          {% for opinion in pos_opinion %}
+          <li class="d-flex flex-row bd-highlight list-group-item">
+              <div class="p-2 bd-highlight">
+                  <audio controls>
+                      <source src="{{ opinion.voice_opinion.vote_url }}" type="audio/wav">
+                    Your browser does not support the audio element.
+                    </audio>
+              </div>
+              <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">{{ opinion.pub_date | date:"l d M Y H:i" }}</span></div>
+          </li>
+          {% endfor %}
+          {% else %}
+          <li class="d-flex flex-row bd-highlight list-group-item">
+
+            <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">Null.</span></div>
+        </li>
+          {% endif %}
+      </ul>
+  </div>
+
+  <div class="col">
+    <ul class="list-group">
+        <li class="list-group-item bg-danger text-light">No</li>
+        {% if neg_opinion %}
+        {% for opinion in neg_opinion %}
+        <li class="d-flex flex-row bd-highlight list-group-item">
+            <div class="p-2 bd-highlight">
+                <audio controls>
+                    <source src="{{ opinion.voice_opinion.vote_url }}" type="audio/wav">
+                  Your browser does not support the audio element.
+                  </audio>
+            </div>
+            <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">{{ opinion.pub_date | date:"l d M Y H:i" }}</span></div>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li class="d-flex flex-row bd-highlight list-group-item">
+
+          <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">Null.</span></div>
+      </li>
+      {% endif %}
+
+    </ul>
+</div>
+
+  </div>
+  
+  <div class="row mb-4">
+    <div class="col">
+      <ul class="list-group">
+          <li class="list-group-item bg-dark text-light">General opinions</li>
+          {% if general_opinion %}
+          {% for opinion in general_opinion %}
+          <li class="d-flex flex-row bd-highlight list-group-item">
+              <div class="p-2 bd-highlight">
+                  <audio controls>
+                      <source src="{{ opinion.vote_url }}" type="audio/wav">
+                    Your browser does not support the audio element.
+                    </audio>
+              </div>
+              <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">{{ opinion.pub_date | date:"l d M Y H:i" }}</span></div>
+          </li>
+          {% endfor %}
+          {% else %}
+          <li class="d-flex flex-row bd-highlight list-group-item">
+
+            <div class="p-2 bd-highlight align-self-center"><span class="align-text-bottom">Null.</span></div>
+        </li>
+          {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>
